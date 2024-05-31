@@ -31,47 +31,64 @@ async function run() {
         await client.connect();
 
 
+        const userCollection = client.db("bistroDB").collection('users')
         const menuCollection = client.db("bistroDB").collection('menu')
         const reviewCollection = client.db("bistroDB").collection('review')
         const cartsCollection = client.db("bistroDB").collection('carts')
 
 
+
+
+        // user collection
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+
+            const query ={email : user.email}
+            const existingUser = await userCollection.findOne(query)
+            if(existingUser){
+                return res.send({message : 'user already exist',insertedId : null})
+            }
+
+            const result = await userCollection.insertOne(user)
+            res.send(result)
+        })
+
         // carts collection
 
 
-        app.get('/carts',async(req,res) =>{
+        app.get('/carts', async (req, res) => {
 
-            const email =req.query.email;
-            const query ={email: email}
+            const email = req.query.email;
+            const query = { email: email }
             const result = await cartsCollection.find(query).toArray()
             res.send(result)
         })
 
-        app.post('/carts',async(req,res) =>{
-            const cartsItem =req.body;
+        app.post('/carts', async (req, res) => {
+            const cartsItem = req.body;
             const result = await cartsCollection.insertOne(cartsItem)
             res.send(result)
         })
 
 
 
-        app.delete('/carts/:id',async(req,res) => {
-            const id =req.params.id;
-            const query ={_id : new ObjectId(id)}
+        app.delete('/carts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
             const result = await cartsCollection.deleteOne(query)
             res.send(result)
         })
 
 
 
-        app.get('/menu',async(req,res) =>{
-            const result =await menuCollection.find().toArray()
+        app.get('/menu', async (req, res) => {
+            const result = await menuCollection.find().toArray()
             res.send(result)
         })
 
 
-        app.get('/review',async(req,res) =>{
-            const result =await reviewCollection.find().toArray()
+        app.get('/review', async (req, res) => {
+            const result = await reviewCollection.find().toArray()
             res.send(result)
         })
 
